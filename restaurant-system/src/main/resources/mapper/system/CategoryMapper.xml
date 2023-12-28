@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.restaurant.system.mapper.CategoryMapper">
+    
+    <resultMap type="Category" id="CategoryResult">
+        <result property="categoryId"    column="category_id"    />
+        <result property="categoryName"    column="category_name"    />
+        <result property="categorySort"    column="category_sort"    />
+        <result property="isDeleted"    column="is_deleted"    />
+    </resultMap>
+
+    <sql id="selectCategoryVo">
+        select category_id, category_name, category_sort, is_deleted from res_category where is_deleted = 0
+    </sql>
+
+    <select id="selectCategoryList" parameterType="Category" resultMap="CategoryResult">
+        select category_id, category_name, category_sort, is_deleted from res_category
+        <where>
+            is_deleted = 0
+            <if test="categoryName != null  and categoryName != ''"> and category_name like concat('%', #{categoryName}, '%')</if>
+            <if test="categorySort != null "> and category_sort = #{categorySort}</if>
+        </where>
+        order by category_sort asc
+    </select>
+    
+    <select id="selectCategoryByCategoryId" parameterType="String" resultMap="CategoryResult">
+        select category_id, category_name, category_sort, is_deleted
+        from res_category
+        where is_deleted = 0
+          and category_id = #{categoryId}
+    </select>
+
+    <insert id="insertCategory" parameterType="Category">
+        insert into res_category
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="categoryId != null">category_id,</if>
+            <if test="categoryName != null and categoryName != ''">category_name,</if>
+            <if test="categorySort != null">category_sort,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="categoryId != null">#{categoryId},</if>
+            <if test="categoryName != null and categoryName != ''">#{categoryName},</if>
+            <if test="categorySort != null">#{categorySort},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCategory" parameterType="Category">
+        update res_category
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="categoryName != null and categoryName != ''">category_name = #{categoryName},</if>
+            <if test="categorySort != null">category_sort = #{categorySort},</if>
+        </trim>
+        where category_id = #{categoryId}
+    </update>
+
+    <delete id="deleteCategoryByCategoryId" parameterType="String">
+        delete from res_category where category_id = #{categoryId}
+    </delete>
+
+<!--    <delete id="deleteCategoryByCategoryIds" parameterType="String">
+        delete from res_category where category_id in
+        <foreach item="categoryId" collection="array" open="(" separator="," close=")">
+            #{categoryId}
+        </foreach>
+    </delete>-->
+
+    <update id="deleteCategoryByCategoryIds" parameterType="String">
+        update res_category set is_deleted = 1 where category_id in
+        <foreach item="categoryId" collection="array" open="(" separator="," close=")">
+            #{categoryId}
+        </foreach>
+    </update>
+
+
+</mapper>

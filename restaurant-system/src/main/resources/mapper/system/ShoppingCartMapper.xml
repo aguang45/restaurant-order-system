@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.restaurant.system.mapper.ShoppingCartMapper">
+    
+    <resultMap type="ShoppingCart" id="ShoppingCartResult">
+        <result property="shoppingCartId"    column="shopping_cart_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="dishId"    column="dish_id"    />
+        <result property="number"    column="number"    />
+        <result property="amount"    column="amount"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="isDeleted"    column="is_deleted"    />
+    </resultMap>
+
+    <sql id="selectShoppingCartVo">
+        select shopping_cart_id, user_id, dish_id, number, amount, create_time, is_deleted from res_shopping_cart
+    </sql>
+
+    <select id="selectShoppingCartList" parameterType="ShoppingCart" resultMap="ShoppingCartResult">
+        <include refid="selectShoppingCartVo"/>
+        <where>  
+            <if test="userId != null  and userId != ''"> and user_id = #{userId}</if>
+            <if test="dishId != null  and dishId != ''"> and dish_id = #{dishId}</if>
+            <if test="number != null "> and number = #{number}</if>
+            <if test="amount != null "> and amount = #{amount}</if>
+            <if test="createTime != null "> and create_time = #{createTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectShoppingCartByShoppingCartId" parameterType="String" resultMap="ShoppingCartResult">
+        <include refid="selectShoppingCartVo"/>
+        where shopping_cart_id = #{shoppingCartId}
+    </select>
+        
+    <insert id="insertShoppingCart" parameterType="ShoppingCart">
+        insert into res_shopping_cart
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="shoppingCartId != null">shopping_cart_id,</if>
+            <if test="userId != null and userId != ''">user_id,</if>
+            <if test="dishId != null and dishId != ''">dish_id,</if>
+            <if test="number != null">number,</if>
+            <if test="amount != null">amount,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="isDeleted != null">is_deleted,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="shoppingCartId != null">#{shoppingCartId},</if>
+            <if test="userId != null and userId != ''">#{userId},</if>
+            <if test="dishId != null and dishId != ''">#{dishId},</if>
+            <if test="number != null">#{number},</if>
+            <if test="amount != null">#{amount},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="isDeleted != null">#{isDeleted},</if>
+         </trim>
+    </insert>
+
+    <update id="updateShoppingCart" parameterType="ShoppingCart">
+        update res_shopping_cart
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null and userId != ''">user_id = #{userId},</if>
+            <if test="dishId != null and dishId != ''">dish_id = #{dishId},</if>
+            <if test="number != null">number = #{number},</if>
+            <if test="amount != null">amount = #{amount},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="isDeleted != null">is_deleted = #{isDeleted},</if>
+        </trim>
+        where shopping_cart_id = #{shoppingCartId}
+    </update>
+
+    <delete id="deleteShoppingCartByShoppingCartId" parameterType="String">
+        delete from res_shopping_cart where shopping_cart_id = #{shoppingCartId}
+    </delete>
+
+    <delete id="deleteShoppingCartByShoppingCartIds" parameterType="String">
+        delete from res_shopping_cart where shopping_cart_id in 
+        <foreach item="shoppingCartId" collection="array" open="(" separator="," close=")">
+            #{shoppingCartId}
+        </foreach>
+    </delete>
+</mapper>

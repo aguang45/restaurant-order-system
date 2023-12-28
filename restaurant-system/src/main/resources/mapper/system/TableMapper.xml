@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.restaurant.system.mapper.TableMapper">
+    
+    <resultMap type="Table" id="TableResult">
+        <result property="tableId"    column="table_id"    />
+        <result property="tableName"    column="table_name"    />
+        <result property="tableSize"    column="table_size"    />
+        <result property="isFree"    column="is_free"    />
+        <result property="isDeleted"    column="is_deleted"    />
+    </resultMap>
+
+    <sql id="selectTableVo">
+        select table_id, table_name, table_size, is_free from res_table where is_deleted = 0
+    </sql>
+
+    <select id="selectTableList" parameterType="Table" resultMap="TableResult">
+        select table_id, table_name, table_size, is_free from res_table
+        <where>
+            is_deleted = 0
+            <if test="tableName != null  and tableName != ''"> and table_name like concat('%', #{tableName}, '%')</if>
+            <if test="tableSize != null "> and table_size >= #{tableSize}</if>
+            <if test="isFree != null "> and is_free = #{isFree}</if>
+        </where>
+    </select>
+    
+    <select id="selectTableByTableId" parameterType="String" resultMap="TableResult">
+        select table_id, table_name, table_size, is_free
+        from res_table
+        where table_id = #{tableId}
+          and is_deleted = 0
+    </select>
+        
+    <insert id="insertTable" parameterType="Table">
+        insert into res_table
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="tableId != null">table_id,</if>
+            <if test="tableName != null and tableName != ''">table_name,</if>
+            <if test="tableSize != null">table_size,</if>
+            <if test="isFree != null">is_free,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="tableId != null">#{tableId},</if>
+            <if test="tableName != null and tableName != ''">#{tableName},</if>
+            <if test="tableSize != null">#{tableSize},</if>
+            <if test="isFree != null">#{isFree},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTable" parameterType="Table">
+        update res_table
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="tableName != null and tableName != ''">table_name = #{tableName},</if>
+            <if test="tableSize != null">table_size = #{tableSize},</if>
+            <if test="isFree != null">is_free = #{isFree},</if>
+        </trim>
+        where table_id = #{tableId} and is_deleted = 0
+    </update>
+
+<!--    <delete id="deleteTableByTableId" parameterType="String">
+        delete from res_table where table_id = #{tableId}
+    </delete>-->
+
+    <update id="deleteTableByTableId" parameterType="String">
+        update res_table set is_deleted = 1 where table_id = #{tableId}
+    </update>
+
+<!--    <delete id="deleteTableByTableIds" parameterType="String">
+        delete from res_table where table_id in 
+        <foreach item="tableId" collection="array" open="(" separator="," close=")">
+            #{tableId}
+        </foreach>
+    </delete>-->
+
+    <update id="deleteTableByTableIds" parameterType="String">
+        update res_table set is_deleted = 1 where table_id in
+        <foreach item="tableId" collection="array" open="(" separator="," close=")">
+            #{tableId}
+        </foreach>
+    </update>
+
+</mapper>

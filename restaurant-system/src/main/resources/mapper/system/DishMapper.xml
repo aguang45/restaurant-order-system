@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.restaurant.system.mapper.DishMapper">
+
+    <resultMap type="dishWithCategory" id="DishResult">
+        <result property="dishId" column="dish_id"/>
+        <result property="dishName" column="dish_name"/>
+        <result property="dishType" column="dish_type"/>
+        <result property="dishPrice" column="dish_price"/>
+        <result property="dishDescription" column="dish_description"/>
+        <result property="dishImage" column="dish_image"/>
+        <result property="isDeleted" column="is_deleted"/>
+        <result property="categoryName" column="category_name"/>
+    </resultMap>
+
+    <!--    <sql id="selectDishVo">
+            select dish_id, dish_name, dish_type, dish_price, dish_description, dish_image, is_deleted from res_dish
+        </sql>   -->
+    <sql id="selectDishVo">
+        select d.*, c.*
+        from res_dish d
+                 left join res_category c on c.category_id = d.dish_type
+        where d.is_deleted = 0
+    </sql>
+
+    <select id="selectDishList" parameterType="Dish" resultMap="DishResult">
+        select d.*, c.*
+        from res_dish d
+        left join res_category c on c.category_id = d.dish_type
+        <where>
+            d.is_deleted = 0
+            <if test="dishName != null  and dishName != ''">and dish_name like concat('%', #{dishName}, '%')</if>
+            <if test="dishType != null  and dishType != ''">and dish_type = #{dishType}</if>
+            <if test="dishPrice != null ">and dish_price = #{dishPrice}</if>
+            <if test="dishDescription != null  and dishDescription != ''">and dish_description = #{dishDescription}</if>
+            <if test="dishImage != null  and dishImage != ''">and dish_image = #{dishImage}</if>
+        </where>
+    </select>
+
+    <select id="selectDishByDishId" parameterType="String" resultMap="DishResult">
+        select d.*, c.*
+        from res_dish d
+                 left join res_category c on c.category_id = d.dish_type
+        where dish_id = #{dishId}
+          and d.is_deleted = 0
+    </select>
+
+    <insert id="insertDish" parameterType="Dish">
+        insert into res_dish
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="dishId != null">dish_id,</if>
+            <if test="dishName != null and dishName != ''">dish_name,</if>
+            <if test="dishType != null and dishType != ''">dish_type,</if>
+            <if test="dishPrice != null">dish_price,</if>
+            <if test="dishDescription != null">dish_description,</if>
+            <if test="dishImage != null">dish_image,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="dishId != null">#{dishId},</if>
+            <if test="dishName != null and dishName != ''">#{dishName},</if>
+            <if test="dishType != null and dishType != ''">#{dishType},</if>
+            <if test="dishPrice != null">#{dishPrice},</if>
+            <if test="dishDescription != null">#{dishDescription},</if>
+            <if test="dishImage != null">#{dishImage},</if>
+        </trim>
+    </insert>
+
+    <update id="updateDish" parameterType="Dish">
+        update res_dish
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="dishName != null and dishName != ''">dish_name = #{dishName},</if>
+            <if test="dishType != null and dishType != ''">dish_type = #{dishType},</if>
+            <if test="dishPrice != null">dish_price = #{dishPrice},</if>
+            <if test="dishDescription != null">dish_description = #{dishDescription},</if>
+            <if test="dishImage != null">dish_image = #{dishImage},</if>
+        </trim>
+        where dish_id = #{dishId} and is_deleted = 0
+    </update>
+
+<!--    <delete id="deleteDishByDishId" parameterType="String">
+        delete
+        from res_dish
+        where dish_id = #{dishId}
+    </delete>-->
+    <update id="deleteDishByDishId" parameterType="String">
+        update res_dish set is_deleted = 1 where dish_id = #{dishId}
+    </update>
+
+<!--    <delete id="deleteDishByDishIds" parameterType="String">
+        delete from res_dish where dish_id in
+        <foreach item="dishId" collection="array" open="(" separator="," close=")">
+            #{dishId}
+        </foreach>
+    </delete>-->
+    <update id="deleteDishByDishIds" parameterType="String">
+        update res_dish set is_deleted = 1 where dish_id in
+        <foreach item="dishId" collection="array" open="(" separator="," close=")">
+            #{dishId}
+        </foreach>
+    </update>
+
+</mapper>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.restaurant.system.mapper.CourierMapper">
+    
+    <resultMap type="Courier" id="CourierResult">
+        <result property="courierId"    column="courier_id"    />
+        <result property="courierName"    column="courier_name"    />
+        <result property="courierPhone"    column="courier_phone"    />
+        <result property="isDeleted"    column="is_deleted"    />
+    </resultMap>
+
+    <sql id="selectCourierVo">
+        select courier_id, courier_name, courier_phone, is_deleted from res_courier
+    </sql>
+
+    <select id="selectCourierList" parameterType="Courier" resultMap="CourierResult">
+        <include refid="selectCourierVo"/>
+        <where>  
+            <if test="courierName != null  and courierName != ''"> and courier_name like concat('%', #{courierName}, '%')</if>
+            <if test="courierPhone != null  and courierPhone != ''"> and courier_phone = #{courierPhone}</if>
+        </where>
+    </select>
+    
+    <select id="selectCourierByCourierId" parameterType="String" resultMap="CourierResult">
+        <include refid="selectCourierVo"/>
+        where courier_id = #{courierId}
+    </select>
+        
+    <insert id="insertCourier" parameterType="Courier">
+        insert into res_courier
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="courierId != null">courier_id,</if>
+            <if test="courierName != null and courierName != ''">courier_name,</if>
+            <if test="courierPhone != null and courierPhone != ''">courier_phone,</if>
+            <if test="isDeleted != null">is_deleted,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="courierId != null">#{courierId},</if>
+            <if test="courierName != null and courierName != ''">#{courierName},</if>
+            <if test="courierPhone != null and courierPhone != ''">#{courierPhone},</if>
+            <if test="isDeleted != null">#{isDeleted},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCourier" parameterType="Courier">
+        update res_courier
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="courierName != null and courierName != ''">courier_name = #{courierName},</if>
+            <if test="courierPhone != null and courierPhone != ''">courier_phone = #{courierPhone},</if>
+            <if test="isDeleted != null">is_deleted = #{isDeleted},</if>
+        </trim>
+        where courier_id = #{courierId}
+    </update>
+
+    <delete id="deleteCourierByCourierId" parameterType="String">
+        delete from res_courier where courier_id = #{courierId}
+    </delete>
+
+    <delete id="deleteCourierByCourierIds" parameterType="String">
+        delete from res_courier where courier_id in 
+        <foreach item="courierId" collection="array" open="(" separator="," close=")">
+            #{courierId}
+        </foreach>
+    </delete>
+</mapper>
