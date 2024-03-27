@@ -58,4 +58,11 @@ public interface UserAddressMapper
      * @return 结果
      */
     public int deleteUserAddressByAddressIds(String[] addressIds);
+
+    /**
+     * 设置默认收货地址
+     * @param userAddress
+     * @return
+     */
+    public int updateDefaultAddress(UserAddress userAddress);
 }

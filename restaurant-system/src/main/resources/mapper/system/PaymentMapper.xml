@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.restaurant.system.mapper.PaymentMapper">
+    
+    <resultMap type="Payment" id="ResPaymentResult">
+        <result property="paymentId"    column="payment_id"    />
+        <result property="orderId"    column="order_id"    />
+        <result property="paymentTime"    column="payment_time"    />
+        <result property="paymentMethod"    column="payment_method"    />
+        <result property="amount"    column="amount"    />
+        <result property="isDeleted"    column="is_deleted"    />
+        <result property="userId"    column="user_id"    />
+    </resultMap>
+
+    <sql id="selectResPaymentVo">
+        select payment_id, order_id, payment_time, payment_method, amount, is_deleted from res_payment
+    </sql>
+
+    <select id="selectResPaymentList" parameterType="Payment" resultMap="ResPaymentResult">
+        select p.payment_id, p.order_id, p.payment_time, p.payment_method, p.amount, p.is_deleted, o.user_id from res_payment p
+        LEFT JOIN res_order o ON p.order_id = o.order_id
+        <where>  
+            <if test="orderId != null  and orderId != ''"> and p.order_id = #{orderId}</if>
+            <if test="paymentTime != null "> and p.payment_time = #{paymentTime}</if>
+            <if test="paymentMethod != null  and paymentMethod != ''"> and p.payment_method = #{paymentMethod}</if>
+            <if test="amount != null "> and p.amount = #{amount}</if>
+            <if test="userId != null "> and o.user_id = #{userId}</if>
+        </where>
+    </select>
+    
+    <select id="selectResPaymentByPaymentId" parameterType="String" resultMap="ResPaymentResult">
+        <include refid="selectResPaymentVo"/>
+        where payment_id = #{paymentId}
+    </select>
+
+    <select id="selectResPaymentByOrderId" parameterType="String" resultMap="ResPaymentResult">
+        <include refid="selectResPaymentVo"/>
+        where order_id = #{orderId}
+    </select>
+    <select id="getTodayPaymentCount" resultType="java.lang.Integer">
+        SELECT SUM(amount)
+        FROM res_payment
+        WHERE DATE(payment_time) = CURDATE();
+    </select>
+    <select id="getThisMonthPaymentCount" resultType="java.lang.Integer">
+        SELECT SUM(amount)
+        FROM res_payment
+        WHERE MONTH(payment_time) = MONTH(CURDATE()) AND YEAR(payment_time) = YEAR(CURDATE());
+    </select>
+    <select id="getTodayPaymentSubtotal" resultType="com.restaurant.system.domain.DTO.CategoryNameAndSubtotal">
+        SELECT
+            res2.category_name ,
+            SUM( res_payment.amount ) subtotal
+        FROM
+            res_payment
+                LEFT JOIN (
+                SELECT
+                    res.category_name,
+                    res_order_detail.order_id
+                FROM
+                    res_order_detail
+                        LEFT JOIN ( SELECT res_dish.dish_id, res_category.category_name FROM res_dish LEFT JOIN res_category ON res_category.category_id = res_dish.dish_type ) AS res ON res.dish_id = res_order_detail.dish_id
+            ) AS res2 ON res_payment.order_id = res2.order_id
+        WHERE DATE(res_payment.payment_time) = CURDATE()
+        GROUP BY
+            res2.category_name
+    </select>
+    <select id="getYesterdayPaymentSubtotal"
+            resultType="com.restaurant.system.domain.DTO.CategoryNameAndSubtotal">
+        SELECT res2.category_name,
+               SUM(res_payment.amount) subtotal
+        FROM res_payment
+                 LEFT JOIN (SELECT res.category_name,
+                                   res_order_detail.order_id
+                            FROM res_order_detail
+                                     LEFT JOIN (SELECT res_dish.dish_id, res_category.category_name
+                                                FROM res_dish
+                                                         LEFT JOIN res_category ON res_category.category_id = res_dish.dish_type) AS res ON res.dish_id = res_order_detail.dish_id) AS res2
+                           ON res_payment.order_id = res2.order_id
+        WHERE DATE(res_payment.payment_time) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)
+        GROUP BY res2.category_name
+    </select>
+
+    <insert id="insertResPayment" parameterType="Payment">
+        insert into res_payment
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="paymentId != null">payment_id,</if>
+            <if test="orderId != null and orderId != ''">order_id,</if>
+            <if test="paymentTime != null">payment_time,</if>
+            <if test="paymentMethod != null and paymentMethod != ''">payment_method,</if>
+            <if test="amount != null">amount,</if>
+            <if test="isDeleted != null">is_deleted,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="paymentId != null">#{paymentId},</if>
+            <if test="orderId != null and orderId != ''">#{orderId},</if>
+            <if test="paymentTime != null">#{paymentTime},</if>
+            <if test="paymentMethod != null and paymentMethod != ''">#{paymentMethod},</if>
+            <if test="amount != null">#{amount},</if>
+            <if test="isDeleted != null">#{isDeleted},</if>
+         </trim>
+    </insert>
+
+    <update id="updateResPayment" parameterType="Payment">
+        update res_payment
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="orderId != null and orderId != ''">order_id = #{orderId},</if>
+            <if test="paymentTime != null">payment_time = #{paymentTime},</if>
+            <if test="paymentMethod != null and paymentMethod != ''">payment_method = #{paymentMethod},</if>
+            <if test="amount != null">amount = #{amount},</if>
+            <if test="isDeleted != null">is_deleted = #{isDeleted},</if>
+        </trim>
+        where payment_id = #{paymentId}
+    </update>
+
+    <delete id="deleteResPaymentByPaymentId" parameterType="String">
+        delete from res_payment where payment_id = #{paymentId}
+    </delete>
+
+    <delete id="deleteResPaymentByPaymentIds" parameterType="String">
+        delete from res_payment where payment_id in 
+        <foreach item="paymentId" collection="array" open="(" separator="," close=")">
+            #{paymentId}
+        </foreach>
+    </delete>
+</mapper>

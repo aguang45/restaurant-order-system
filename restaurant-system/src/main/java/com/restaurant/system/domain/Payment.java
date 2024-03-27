@@ -1,7 +1,8 @@
 package com.restaurant.system.domain;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -14,7 +15,7 @@ import com.restaurant.common.core.domain.BaseEntity;
  * @author aguang
  * @date 2023-12-28
  */
-public class ResPayment extends BaseEntity
+public class Payment extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 
@@ -28,7 +29,7 @@ public class ResPayment extends BaseEntity
     /** 支付时间 */
     @JsonFormat(pattern = "yyyy-MM-dd")
     @Excel(name = "支付时间", width = 30, dateFormat = "yyyy-MM-dd")
-    private Date paymentTime;
+    private LocalDateTime paymentTime;
 
     /** 支付方式 */
     @Excel(name = "支付方式")
@@ -38,10 +39,21 @@ public class ResPayment extends BaseEntity
     @Excel(name = "支付金额")
     private BigDecimal amount;
 
+    /** 用户id */
+    private String userId;
+
     /** 逻辑删除 */
     private Integer isDeleted;
 
-    public void setPaymentId(String paymentId) 
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public void setPaymentId(String paymentId)
     {
         this.paymentId = paymentId;
     }
@@ -59,12 +71,12 @@ public class ResPayment extends BaseEntity
     {
         return orderId;
     }
-    public void setPaymentTime(Date paymentTime) 
+    public void setPaymentTime(LocalDateTime paymentTime)
     {
         this.paymentTime = paymentTime;
     }
 
-    public Date getPaymentTime() 
+    public LocalDateTime getPaymentTime()
     {
         return paymentTime;
     }

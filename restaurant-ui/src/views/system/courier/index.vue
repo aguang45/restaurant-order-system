@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="配送员姓名" prop="courierName">
+      <el-form-item label="配送员姓名" prop="courierName" label-width="30">
         <el-input
           v-model="queryParams.courierName"
           placeholder="请输入配送员姓名"
@@ -9,7 +9,7 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="配送员手机号" prop="courierPhone">
+      <el-form-item label="配送员手机号" prop="courierPhone" label-width="30">
         <el-input
           v-model="queryParams.courierPhone"
           placeholder="请输入配送员手机号"
@@ -93,7 +93,7 @@
         </template>
       </el-table-column>
     </el-table>
-    
+
     <pagination
       v-show="total>0"
       :total="total"

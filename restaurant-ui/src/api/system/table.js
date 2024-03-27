@@ -9,6 +9,24 @@ export function listTable(query) {
   })
 }
 
+// 查询带订单信息桌位列表
+export function listTableWithOrder(query) {
+  return request({
+    url: '/system/table/withOrderList',
+    method: 'get',
+    params: query
+  })
+}
+
+// 查询带订单信息桌位列表
+export function setTableFree(query) {
+  return request({
+    url: '/system/table/setTableFree',
+    method: 'put',
+    params: query
+  })
+}
+
 // 查询桌位详细
 export function getTable(tableId) {
   return request({

@@ -2,6 +2,9 @@ package com.restaurant.system.mapper;
 
 import java.util.List;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.restaurant.system.domain.DTO.CategoryWithDish;
+import com.restaurant.system.domain.DTO.DishTop;
 import com.restaurant.system.domain.DTO.DishWithCategory;
 import com.restaurant.system.domain.Dish;
 
@@ -11,7 +14,7 @@ import com.restaurant.system.domain.Dish;
  * @author agunag
  * @date 2023-12-28
  */
-public interface DishMapper 
+public interface DishMapper extends BaseMapper<Dish>
 {
     /**
      * 查询菜品
@@ -60,4 +63,8 @@ public interface DishMapper
      * @return 结果
      */
     public int deleteDishByDishIds(String[] dishIds);
+
+    public List<Dish> selectDishNameList(Dish dish);
+
+    public List<DishTop> getDishTop();
 }

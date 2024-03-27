@@ -47,6 +47,34 @@
           and d.is_deleted = 0
     </select>
 
+    <select id="selectDishNameList" resultType="com.restaurant.system.domain.Dish">
+        select dish_id,dish_name from res_dish where is_deleted = 0
+    </select>
+    <select id="getDishTop" resultType="com.restaurant.system.domain.DTO.DishTop">
+        SELECT
+            di.category_name,
+            di.dish_name,
+            di.dish_price,
+            COUNT(*) count
+        FROM
+            `res_order_detail` d
+                LEFT JOIN (
+                SELECT
+                    d.dish_id,
+                    d.dish_name,
+                    d.dish_price,
+                    c.category_name
+                FROM
+                    res_dish d
+                        LEFT JOIN res_category c ON d.dish_type = c.category_id
+            ) di ON d.dish_id = di.dish_id
+        GROUP BY
+            d.dish_id
+        ORDER BY
+            count DESC
+        LIMIT 6
+    </select>
+
     <insert id="insertDish" parameterType="Dish">
         insert into res_dish
         <trim prefix="(" suffix=")" suffixOverrides=",">

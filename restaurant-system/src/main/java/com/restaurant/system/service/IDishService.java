@@ -2,6 +2,9 @@ package com.restaurant.system.service;
 
 import java.util.List;
 
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.restaurant.system.domain.DTO.CategoryWithDish;
+import com.restaurant.system.domain.DTO.DishTop;
 import com.restaurant.system.domain.DTO.DishWithCategory;
 import com.restaurant.system.domain.Dish;
 
@@ -11,7 +14,7 @@ import com.restaurant.system.domain.Dish;
  * @author agunag
  * @date 2023-12-28
  */
-public interface IDishService 
+public interface IDishService extends IService<Dish>
 {
     /**
      * 查询菜品
@@ -60,4 +63,12 @@ public interface IDishService
      * @return 结果
      */
     public int deleteDishByDishId(String dishId);
+
+    List<CategoryWithDish> selectCategoryWithDishList();
+
+    List<Dish> selectDishNameList(Dish dish);
+
+    List<DishTop> selectDishTopList();
+
+    String importDish(List<Dish> dishList, Boolean isUpdateSupport, String operName);
 }

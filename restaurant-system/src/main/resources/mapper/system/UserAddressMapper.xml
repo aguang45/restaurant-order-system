@@ -21,19 +21,22 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectUserAddressList" parameterType="UserAddress" resultMap="UserAddressResult">
         <include refid="selectUserAddressVo"/>
-        <where>  
+        <where>
+            <if test="addressId != null  and addressId != '' and addressId != 'undefined'"> and address_id = #{addressId}</if>
             <if test="userId != null  and userId != ''"> and user_id = #{userId}</if>
-            <if test="phone != null "> and phone = #{phone}</if>
+            <if test="phone != null "> and phone like concat('%', #{phone}, '%')</if>
             <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
             <if test="sex != null  and sex != ''"> and sex = #{sex}</if>
-            <if test="detailAddress != null  and detailAddress != ''"> and detail_address = #{detailAddress}</if>
+            <if test="detailAddress != null  and detailAddress != ''"> and detail_address like concat('%', #{detailAddress}, '%')</if>
             <if test="isDefault != null "> and is_default = #{isDefault}</if>
+             and is_deleted = 0
         </where>
+        order by is_default desc
     </select>
     
     <select id="selectUserAddressByAddressId" parameterType="String" resultMap="UserAddressResult">
         <include refid="selectUserAddressVo"/>
-        where address_id = #{addressId}
+        where address_id = #{addressId} and is_deleted = 0
     </select>
         
     <insert id="insertUserAddress" parameterType="UserAddress">
@@ -71,17 +74,32 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="isDefault != null">is_default = #{isDefault},</if>
             <if test="isDeleted != null">is_deleted = #{isDeleted},</if>
         </trim>
-        where address_id = #{addressId}
+        where address_id = #{addressId} and is_deleted = 0
     </update>
 
-    <delete id="deleteUserAddressByAddressId" parameterType="String">
-        delete from res_user_address where address_id = #{addressId}
-    </delete>
+    <update id="updateDefaultAddress">
+        update res_user_address set is_default = 0 where user_id = #{userId} and is_deleted = 0
+    </update>
 
-    <delete id="deleteUserAddressByAddressIds" parameterType="String">
+<!--    <delete id="deleteUserAddressByAddressId" parameterType="String">
+        delete from res_user_address where address_id = #{addressId}
+    </delete>-->
+    <update id="deleteUserAddressByAddressId" parameterType="String">
+        update res_user_address set is_deleted = 1 where address_id = #{addressId}
+    </update>
+
+    <update id="deleteUserAddressByAddressIds" parameterType="String">
+        update res_user_address set is_deleted = 1 where address_id in
+        <foreach item="addressId" collection="array" open="(" separator="," close=")">
+            #{addressId}
+        </foreach>
+    </update>
+
+
+<!--    <delete id="deleteUserAddressByAddressIds" parameterType="String">
         delete from res_user_address where address_id in 
         <foreach item="addressId" collection="array" open="(" separator="," close=")">
             #{addressId}
         </foreach>
-    </delete>
+    </delete>-->
 </mapper>

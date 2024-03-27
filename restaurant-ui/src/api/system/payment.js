@@ -42,3 +42,19 @@ export function delPayment(paymentId) {
     method: 'delete'
   })
 }
+
+//获取今日各菜系支付总额
+export function getTodayCategorySubtotal() {
+  return request({
+    url: '/system/payment/todayCategoryNameAndSubtotal',
+    method: 'get'
+  })
+}
+
+//获取昨日各菜品支付总额
+export function getYesterdayCategorySubtotal() {
+  return request({
+    url: '/system/payment/yesterdayCategoryNameAndSubtotal',
+    method: 'get'
+  })
+}

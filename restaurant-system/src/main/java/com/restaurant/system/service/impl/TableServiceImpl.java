@@ -3,6 +3,9 @@ package com.restaurant.system.service.impl;
 import java.util.List;
 
 import com.restaurant.common.utils.uuid.UUID;
+import com.restaurant.system.domain.DTO.TableWithOrderDTO;
+import com.restaurant.system.domain.Order;
+import com.restaurant.system.mapper.OrderMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.restaurant.system.mapper.TableMapper;
@@ -20,6 +23,8 @@ public class TableServiceImpl implements ITableService
 {
     @Autowired
     private TableMapper tableMapper;
+    @Autowired
+    private OrderMapper orderMapper;
 
     /**
      * 查询桌位
@@ -92,5 +97,34 @@ public class TableServiceImpl implements ITableService
     public int deleteTableByTableId(String tableId)
     {
         return tableMapper.deleteTableByTableId(tableId);
+    }
+
+    /**
+     * 获取桌位和订单信息
+     * @param tableWithOrderDTO
+     * @return
+     */
+    @Override
+    public List<TableWithOrderDTO> getTableWithOrder(TableWithOrderDTO tableWithOrderDTO) {
+        return tableMapper.getTableWithOrder(tableWithOrderDTO);
+    }
+
+    @Override
+    public boolean setTableFree(String tableId, String orderId) {
+        Table table = tableMapper.selectTableByTableId(tableId);
+        if (table == null) {
+            return false;
+        }
+        table.setIsFree(1);
+        int updateTable = tableMapper.updateTable(table);
+
+        Order order = orderMapper.selectOrderByOrderId(orderId);
+        if (order == null) {
+            return false;
+        }
+        order.setOrderStatus("3");
+        int updateOrder = orderMapper.updateOrder(order);
+
+        return updateTable > 0 && updateOrder > 0;
     }
 }

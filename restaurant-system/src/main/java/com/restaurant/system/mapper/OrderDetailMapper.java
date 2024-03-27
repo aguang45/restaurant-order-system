@@ -17,7 +17,14 @@ public interface OrderDetailMapper
      * @param orderDetailId 订单详情主键
      * @return 订单详情
      */
-    public OrderDetail selectOrderDetailByOrderDetailId(String orderDetailId);
+    public List<OrderDetail> selectOrderDetailByOrderDetailId(String orderDetailId);
+
+    /**
+     * 查询订单详情列表
+     * @param orderId
+     * @return
+     */
+    public List<OrderDetail> selectOrderDetailByOrderId(String orderId);
 
     /**
      * 查询订单详情列表

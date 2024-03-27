@@ -1,5 +1,6 @@
 package com.restaurant.system.domain;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -25,9 +26,9 @@ public class Order extends BaseEntity
     private String userId;
 
     /** 订单时间 */
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    @Excel(name = "订单时间", width = 30, dateFormat = "yyyy-MM-dd")
-    private Date orderTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Excel(name = "订单时间", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime orderTime;
 
     /** 订单状态 */
     @Excel(name = "订单状态")
@@ -70,12 +71,12 @@ public class Order extends BaseEntity
     {
         return userId;
     }
-    public void setOrderTime(Date orderTime) 
+    public void setOrderTime(LocalDateTime orderTime)
     {
         this.orderTime = orderTime;
     }
 
-    public Date getOrderTime() 
+    public LocalDateTime getOrderTime()
     {
         return orderTime;
     }

@@ -22,22 +22,108 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectOrderList" parameterType="Order" resultMap="OrderResult">
         <include refid="selectOrderVo"/>
-        <where>  
+        <where>
             <if test="userId != null  and userId != ''"> and user_id = #{userId}</if>
-            <if test="orderTime != null "> and order_time = #{orderTime}</if>
+            <if test="orderId != null  and orderId != ''"> and order_id = #{orderId}</if>
+            <if test="orderTime != null "> and order_time >= #{orderTime}</if>
             <if test="orderStatus != null  and orderStatus != ''"> and order_status = #{orderStatus}</if>
             <if test="tableId != null  and tableId != ''"> and table_id = #{tableId}</if>
             <if test="addressId != null  and addressId != ''"> and address_id = #{addressId}</if>
             <if test="deliveryStatus != null  and deliveryStatus != ''"> and delivery_status = #{deliveryStatus}</if>
             <if test="courierId != null  and courierId != ''"> and courier_id = #{courierId}</if>
         </where>
+        order by order_time desc
+    </select>
+
+    <select id="selectOrderListRecent" parameterType="Order" resultMap="OrderResult">
+        <include refid="selectOrderVo"/>
+        <where>
+            order_time > NOW() - INTERVAL 30 MINUTE;
+            <if test="userId != null  and userId != ''"> and user_id = #{userId}</if>
+            <if test="orderId != null  and orderId != ''"> and order_id = #{orderId}</if>
+            <if test="orderTime != null "> and order_time >= #{orderTime}</if>
+            <if test="orderStatus != null  and orderStatus != ''"> and order_status = #{orderStatus}</if>
+            <if test="tableId != null  and tableId != ''"> and table_id = #{tableId}</if>
+            <if test="addressId != null  and addressId != ''"> and address_id = #{addressId}</if>
+            <if test="deliveryStatus != null  and deliveryStatus != ''"> and delivery_status = #{deliveryStatus}</if>
+            <if test="courierId != null  and courierId != ''"> and courier_id = #{courierId}</if>
+
+        </where>
+        order by order_time desc
     </select>
     
     <select id="selectOrderByOrderId" parameterType="String" resultMap="OrderResult">
         <include refid="selectOrderVo"/>
         where order_id = #{orderId}
     </select>
-        
+    <select id="getCancelOrderCount" resultType="java.lang.Integer">
+        SELECT SUM(subtotal) FROM res_order_detail WHERE order_id IN( SELECT order_id FROM res_order WHERE order_status = 2 AND MONTH(order_time) = MONTH(CURDATE()) AND YEAR(order_time) = YEAR(CURDATE()));
+    </select>
+    <select id="getOrderWithOtherList" resultType="com.restaurant.system.domain.DTO.OrderWithOther">
+        SELECT
+        res_order.*,
+        sys_user.user_name,
+        res_user_address.name,
+        res_user_address.detail_address,
+        res_user_address.phone,
+        res_courier.courier_name,
+        res_courier.courier_phone
+        FROM
+        res_order
+        LEFT JOIN sys_user ON res_order.user_id = sys_user.user_id
+        LEFT JOIN res_user_address ON res_order.address_id = res_user_address.address_id
+        LEFT JOIN res_courier ON res_order.courier_id = res_courier.courier_id
+        WHERE
+        res_order.address_id IS NOT NULL
+        AND order_status = 1
+        AND res_order.is_deleted = 0
+        <if test="name != null  and name != ''">and res_user_address.name like #{name}</if>
+        <if test="orderTime != null ">and order_time >= #{orderTime}</if>
+        <if test="userId != null  and userId != ''">and user_id = #{userId}</if>
+        <if test="orderId != null  and orderId != ''">and order_id = #{orderId}</if>
+        <if test="tableId != null  and tableId != ''">and table_id = #{tableId}</if>
+        <if test="deliveryStatus != null  and deliveryStatus != ''">and delivery_status = #{deliveryStatus}</if>
+        <if test="courierId != null  and courierId != ''">and courier_id = #{courierId}</if>
+        <if test="orderStatus != null  and orderStatus != ''">and order_status = #{orderStatus}</if>
+        <if test="addressId != null  and userAddressId != ''">and address_id = #{addressId}</if>
+        <if test="userName != null  and userName != ''">and sys_user.user_name like #{userName}</if>
+        <if test="detailAddress != null  and detailAddress != ''">and res_user_address.detail_address like #{detailAddress}</if>
+        <if test="phone != null  and phone != ''">and res_user_address.phone like #{phone}</if>
+        <if test="courierName != null  and courierName != ''">and res_courier.courier_name like #{courierName}</if>
+        <if test="courierPhone != null  and courierPhone != ''">and res_courier.courier_phone like #{courierPhone}</if>
+        ORDER BY order_time DESC
+    </select>
+
+    <select id="getOrderWithOtherForList" resultType="com.restaurant.system.domain.DTO.OrderWithOtherForList">
+        SELECT
+            res_order.*,
+            sys_user.user_name,
+            sys_user.phonenumber phoneNumber,
+            res_table.*,
+            res_user_address.detail_address userAddress,
+            res_user_address.sex userSex,
+            res_user_address.phone userPhone,
+            res_courier.*
+        FROM
+            res_order
+                LEFT JOIN sys_user ON res_order.user_id = sys_user.user_id
+                LEFT JOIN res_table ON res_order.table_id = res_table.table_id
+                LEFT JOIN res_user_address ON res_order.address_id = res_user_address.address_id
+                LEFT JOIN res_courier ON res_order.courier_id = res_courier.courier_id
+        WHERE res_order.is_deleted = 0
+        <if test="orderId != null  and orderId != ''">and res_order.order_id = #{orderId}</if>
+        <if test="userId != null  and userId != ''">and res_order.user_id = #{userId}</if>
+        <if test="orderTime != null ">and res_order.order_time >= #{orderTime}</if>
+        <if test="orderStatus != null  and orderStatus != ''">and res_order.order_status = #{orderStatus}</if>
+        <if test="tableId != null  and tableId != ''">and res_order.table_id = #{tableId}</if>
+        <if test="addressId != null  and addressId != ''">and res_order.address_id = #{addressId}</if>
+        <if test="deliveryStatus != null  and deliveryStatus != ''">and res_order.delivery_status = #{deliveryStatus}</if>
+        <if test="courierId != null  and courierId != ''">and res_order.courier_id = #{courierId}</if>
+        <if test="isDeleted != null  and isDeleted != ''">and res_order.is_deleted = #{isDeleted}</if>
+        ORDER BY
+            res_order.order_time DESC
+    </select>
+
     <insert id="insertOrder" parameterType="Order">
         insert into res_order
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -79,9 +165,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where order_id = #{orderId}
     </update>
 
-    <delete id="deleteOrderByOrderId" parameterType="String">
+    <update id="deleteOrderByOrderId" parameterType="String">
+        update res_order set is_deleted = 1 where order_id = #{orderId}
+    </update>
+
+<!--    <delete id="deleteOrderByOrderId" parameterType="String">
         delete from res_order where order_id = #{orderId}
-    </delete>
+    </delete>-->
 
     <delete id="deleteOrderByOrderIds" parameterType="String">
         delete from res_order where order_id in 

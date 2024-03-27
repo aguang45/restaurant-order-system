@@ -135,6 +135,21 @@ export const dynamicRoutes = [
     ]
   },
   {
+    path: '/restaurant/order-data',
+    component: Layout,
+    hidden: true,
+    permissions: ['system:payment:list'],
+    children: [
+      {
+        // path: 'index/:orderId(\\d+)',
+        path: 'index/:orderId([0-9a-fA-F]+)',
+        component: () => import('@/views/system/order/index'),
+        name: 'OrderData',
+        meta: { title: '订单详情', activeMenu: '/restaurant/order' }
+      }
+    ]
+  },
+  {
     path: '/monitor/job-log',
     component: Layout,
     hidden: true,

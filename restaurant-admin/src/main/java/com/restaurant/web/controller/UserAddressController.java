@@ -2,6 +2,8 @@ package com.restaurant.web.controller;
 
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
+
+import com.restaurant.system.domain.DTO.UserAddressWithUser;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,7 +44,19 @@ public class UserAddressController extends BaseController
     public TableDataInfo list(UserAddress userAddress)
     {
         startPage();
-        List<UserAddress> list = userAddressService.selectUserAddressList(userAddress);
+        List<UserAddressWithUser> list = userAddressService.selectUserAddressList(userAddress);
+        return getDataTable(list);
+    }
+
+    /**
+     * 查询收货地址列表
+     */
+    @PreAuthorize("@ss.hasPermi('system:address:query')")
+    @GetMapping("/appList")
+    public TableDataInfo appList(String addressId)
+    {
+        startPage();
+        List<UserAddressWithUser> list = userAddressService.selectUserAddressAppList(addressId);
         return getDataTable(list);
     }
 
@@ -54,8 +68,8 @@ public class UserAddressController extends BaseController
     @PostMapping("/export")
     public void export(HttpServletResponse response, UserAddress userAddress)
     {
-        List<UserAddress> list = userAddressService.selectUserAddressList(userAddress);
-        ExcelUtil<UserAddress> util = new ExcelUtil<UserAddress>(UserAddress.class);
+        List<UserAddressWithUser> list = userAddressService.selectUserAddressList(userAddress);
+        ExcelUtil<UserAddressWithUser> util = new ExcelUtil<UserAddressWithUser>(UserAddressWithUser.class);
         util.exportExcel(response, list, "收货地址数据");
     }
 

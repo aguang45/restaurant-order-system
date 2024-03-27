@@ -54,10 +54,6 @@
         </div>
       </el-form-item>
     </el-form>
-    <!--  底部  -->
-    <div class="el-login-footer">
-      <span>Copyright © 2018-2023 ruoyi.vip All Rights Reserved.</span>
-    </div>
   </div>
 </template>
 
@@ -72,8 +68,8 @@ export default {
     return {
       codeUrl: "",
       loginForm: {
-        username: "admin",
-        password: "admin123",
+        username: "",
+        password: "",
         rememberMe: false,
         code: "",
         uuid: ""
@@ -171,8 +167,9 @@ export default {
 }
 
 .login-form {
-  border-radius: 6px;
-  background: #ffffff;
+  border-radius: 20px;
+  //background: #ffffff;
+  background: rgb(255, 255, 255, 0.88);
   width: 400px;
   padding: 25px 25px 5px 25px;
   .el-input {

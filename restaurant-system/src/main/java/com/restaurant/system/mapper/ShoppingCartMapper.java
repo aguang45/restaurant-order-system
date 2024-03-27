@@ -49,7 +49,7 @@ public interface ShoppingCartMapper
      * @param shoppingCartId 购物车主键
      * @return 结果
      */
-    public int deleteShoppingCartByShoppingCartId(String shoppingCartId);
+    public int deleteShoppingCartByShoppingCart(ShoppingCart shoppingCart);
 
     /**
      * 批量删除购物车

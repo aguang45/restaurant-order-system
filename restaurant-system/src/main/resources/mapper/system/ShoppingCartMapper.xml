@@ -15,23 +15,24 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectShoppingCartVo">
-        select shopping_cart_id, user_id, dish_id, number, amount, create_time, is_deleted from res_shopping_cart
+        select shopping_cart_id, user_id, dish_id, number, amount, create_time, is_deleted from res_shopping_cart where is_deleted = 0
     </sql>
 
     <select id="selectShoppingCartList" parameterType="ShoppingCart" resultMap="ShoppingCartResult">
-        <include refid="selectShoppingCartVo"/>
-        <where>  
+        select shopping_cart_id, user_id, dish_id, number, amount, create_time, is_deleted from res_shopping_cart
+        <where>
+            and is_deleted = 0
             <if test="userId != null  and userId != ''"> and user_id = #{userId}</if>
             <if test="dishId != null  and dishId != ''"> and dish_id = #{dishId}</if>
             <if test="number != null "> and number = #{number}</if>
             <if test="amount != null "> and amount = #{amount}</if>
-            <if test="createTime != null "> and create_time = #{createTime}</if>
+            <if test="createTime != null "> and create_time >= #{createTime}</if>
         </where>
     </select>
     
     <select id="selectShoppingCartByShoppingCartId" parameterType="String" resultMap="ShoppingCartResult">
-        <include refid="selectShoppingCartVo"/>
-        where shopping_cart_id = #{shoppingCartId}
+        select shopping_cart_id, user_id, dish_id, number, amount, create_time, is_deleted from res_shopping_cart
+        where shopping_cart_id = #{shoppingCartId} and is_deleted = 0
     </select>
         
     <insert id="insertShoppingCart" parameterType="ShoppingCart">
@@ -66,17 +67,36 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="isDeleted != null">is_deleted = #{isDeleted},</if>
         </trim>
-        where shopping_cart_id = #{shoppingCartId}
+        where shopping_cart_id = #{shoppingCartId} and is_deleted = 0
     </update>
 
-    <delete id="deleteShoppingCartByShoppingCartId" parameterType="String">
-        delete from res_shopping_cart where shopping_cart_id = #{shoppingCartId}
-    </delete>
+    <update id="deleteShoppingCartByShoppingCart" parameterType="ShoppingCart">
+        update res_shopping_cart set is_deleted = 1
+        <where>
+            <if test="shoppingCartId != null and shoppingCartId != ''"> and shopping_cart_id = #{shoppingCartId}</if>
+            <if test="userId != null and userId != ''"> and user_id = #{userId}</if>
+            <if test="dishId != null and dishId != ''"> and dish_id = #{dishId}</if>
+            <if test="number != null"> and number = #{number}</if>
+            <if test="amount != null"> and amount = #{amount}</if>
+            <if test="createTime != null"> and create_time = #{createTime}</if>
+        </where>
+    </update>
 
-    <delete id="deleteShoppingCartByShoppingCartIds" parameterType="String">
+<!--    <delete id="deleteShoppingCartByShoppingCartId" parameterType="String">
+        delete from res_shopping_cart where shopping_cart_id = #{shoppingCartId}
+    </delete>-->
+
+    <update id="deleteShoppingCartByShoppingCartIds" parameterType="String">
+        update res_shopping_cart set is_deleted = 1 where shopping_cart_id in
+        <foreach item="shoppingCartId" collection="array" open="(" separator="," close=")">
+            #{shoppingCartId}
+        </foreach>
+    </update>
+
+<!--    <delete id="deleteShoppingCartByShoppingCartIds" parameterType="String">
         delete from res_shopping_cart where shopping_cart_id in 
         <foreach item="shoppingCartId" collection="array" open="(" separator="," close=")">
             #{shoppingCartId}
         </foreach>
-    </delete>
+    </delete>-->
 </mapper>

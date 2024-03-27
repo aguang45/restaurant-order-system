@@ -29,7 +29,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     
     <select id="selectOrderDetailByOrderDetailId" parameterType="String" resultMap="OrderDetailResult">
         <include refid="selectOrderDetailVo"/>
-        where order_detail_id = #{orderDetailId}
+        where is_deleted = 0 and order_detail_id = #{orderDetailId}
+    </select>
+
+    <select id="selectOrderDetailByOrderId" parameterType="String" resultMap="OrderDetailResult">
+        <include refid="selectOrderDetailVo"/>
+        where is_deleted = 0 and order_id = #{orderId}
     </select>
         
     <insert id="insertOrderDetail" parameterType="OrderDetail">

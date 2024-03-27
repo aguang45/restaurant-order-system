@@ -1,6 +1,17 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
+      <el-form-item label="用户姓名" prop="userId">
+        <el-select v-model="queryParams.userId" clearable
+                   filterable placeholder="请选择用户姓名">
+          <el-option
+            v-for="item in userList"
+            :key="item.userId"
+            :label="item.nickName"
+            :value="item.userId">
+          </el-option>
+        </el-select>
+      </el-form-item>
       <el-form-item label="订单id" prop="orderId">
         <el-input
           v-model="queryParams.orderId"
@@ -18,12 +29,22 @@
         </el-date-picker>
       </el-form-item>
       <el-form-item label="支付方式" prop="paymentMethod">
-        <el-input
+<!--        <el-input
           v-model="queryParams.paymentMethod"
           placeholder="请输入支付方式"
           clearable
           @keyup.enter.native="handleQuery"
-        />
+        />-->
+        <el-select v-model="queryParams.userId" clearable
+                   filterable placeholder="请选择支付方式">
+          <el-option
+            v-for="item in dict.type.payment_method"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
+
       </el-form-item>
       <el-form-item label="支付金额" prop="amount">
         <el-input
@@ -40,7 +61,7 @@
     </el-form>
 
     <el-row :gutter="10" class="mb8">
-      <el-col :span="1.5">
+<!--      <el-col :span="1.5">
         <el-button
           type="primary"
           plain
@@ -71,7 +92,7 @@
           @click="handleDelete"
           v-hasPermi="['system:payment:remove']"
         >删除</el-button>
-      </el-col>
+      </el-col>-->
       <el-col :span="1.5">
         <el-button
           type="warning"
@@ -87,16 +108,36 @@
 
     <el-table v-loading="loading" :data="paymentList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="支付id" align="center" prop="paymentId" />
-      <el-table-column label="订单id" align="center" prop="orderId" />
+<!--      <el-table-column label="支付id" align="center" prop="paymentId" />-->
+      <el-table-column label="订单id" align="center" :show-overflow-tooltip="true">
+        <template slot-scope="scope">
+          <router-link :to="'/restaurant/order-data/index/' + scope.row.orderId" class="link-type">
+            <span>{{ scope.row.orderId }}</span>
+          </router-link>
+        </template>
+      </el-table-column>
+      <el-table-column label="用户姓名" align="center" prop="userName" />
       <el-table-column label="支付时间" align="center" prop="paymentTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.paymentTime, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="支付方式" align="center" prop="paymentMethod" />
-      <el-table-column label="支付金额" align="center" prop="amount" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="支付方式" align="center" prop="paymentMethod">
+        <template slot-scope="scope">
+          <el-tag
+            v-for="item in dict.type.payment_method"
+            :key="item.value"
+            v-if="item.value === scope.row.paymentMethod"
+            :type="item.color"
+          >{{ item.label }}</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column label="支付金额" align="center" prop="amount">
+        <template slot-scope="scope">
+          <span>￥{{ scope.row.amount }}</span>
+        </template>
+      </el-table-column>
+<!--      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -113,9 +154,9 @@
             v-hasPermi="['system:payment:remove']"
           >删除</el-button>
         </template>
-      </el-table-column>
+      </el-table-column>-->
     </el-table>
-    
+
     <pagination
       v-show="total>0"
       :total="total"
@@ -155,12 +196,15 @@
 
 <script>
 import { listPayment, getPayment, delPayment, addPayment, updatePayment } from "@/api/system/payment";
+import {listUser} from "@/api/system/user";
 
 export default {
   name: "Payment",
-  dicts: ['is_deleted'],
+  dicts: ['payment_method'],
   data() {
     return {
+      // 用户列表
+      userList:[],
       // 遮罩层
       loading: true,
       // 选中数组
@@ -209,8 +253,15 @@ export default {
   },
   created() {
     this.getList();
+    this.getUserList();
   },
   methods: {
+    /** 获取用户列表 */
+    getUserList() {
+      listUser({pageNum: 1, pageSize: 1000}).then(response => {
+        this.userList = response.rows;
+      });
+    },
     /** 查询支付信息列表 */
     getList() {
       this.loading = true;

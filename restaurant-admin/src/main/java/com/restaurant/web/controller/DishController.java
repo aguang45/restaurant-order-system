@@ -3,6 +3,12 @@ package com.restaurant.web.controller;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
+import com.restaurant.common.annotation.Anonymous;
+import com.restaurant.common.core.domain.model.LoginUser;
+import com.restaurant.common.utils.ServletUtils;
+import com.restaurant.framework.web.service.TokenService;
+import com.restaurant.system.domain.DTO.CategoryWithDish;
+import com.restaurant.system.domain.DTO.DishTop;
 import com.restaurant.system.domain.DTO.DishWithCategory;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +28,7 @@ import com.restaurant.system.domain.Dish;
 import com.restaurant.system.service.IDishService;
 import com.restaurant.common.utils.poi.ExcelUtil;
 import com.restaurant.common.core.page.TableDataInfo;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 菜品Controller
@@ -36,6 +43,9 @@ public class DishController extends BaseController
     @Autowired
     private IDishService dishService;
 
+    @Autowired
+    private TokenService tokenService;
+
     /**
      * 查询菜品列表
      */
@@ -46,6 +56,32 @@ public class DishController extends BaseController
         startPage();
         List<DishWithCategory> list = dishService.selectDishList(dish);
         return getDataTable(list);
+    }
+
+    /**
+     * 查询菜品列表
+     */
+//    @PreAuthorize("@ss.hasPermi('system:dish:list')")
+    @Anonymous
+    @GetMapping("/appList")
+    public List<CategoryWithDish> listAll()
+    {
+        List<CategoryWithDish> list = dishService.selectCategoryWithDishList();
+        return list;
+    }
+
+    /**
+     * 查询菜品列表
+     *
+     * @param dish
+     * @return
+     */
+    @PreAuthorize("@ss.hasPermi('system:dish:query')")
+    @GetMapping("/dishNameList")
+    public List<Dish> dishNameList(Dish dish)
+    {
+        List<Dish> list = dishService.selectDishNameList(dish);
+        return list;
     }
 
     /**
@@ -102,5 +138,34 @@ public class DishController extends BaseController
     public AjaxResult remove(@PathVariable String[] dishIds)
     {
         return toAjax(dishService.deleteDishByDishIds(dishIds));
+    }
+
+    /**
+     * 获取菜品排行榜
+     */
+    @PreAuthorize("@ss.hasPermi('system:dish:add')")
+    @GetMapping("/getDishTop")
+    public AjaxResult getDishTop()
+    {
+        return success(dishService.selectDishTopList());
+    }
+
+    @Log(title = "菜品数据", businessType = BusinessType.IMPORT)
+    @PostMapping("/importData")
+    public AjaxResult importData(MultipartFile file, boolean updateSupport) throws Exception
+    {
+        ExcelUtil<Dish> util = new ExcelUtil<Dish>(Dish.class);
+        List<Dish> list = util.importExcel("菜品信息",file.getInputStream(),1);
+        LoginUser loginUser = tokenService.getLoginUser(ServletUtils.getRequest());
+        String operName = loginUser.getUsername();
+        String message = dishService.importDish(list, updateSupport, operName);
+        return AjaxResult.success(message);
+    }
+
+    @PostMapping("/importTemplate")
+    public void importTemplate(HttpServletResponse response)
+    {
+        ExcelUtil<Dish> util = new ExcelUtil<Dish>(Dish.class);
+        util.importTemplateExcel(response,"菜品信息","菜品信息");
     }
 }

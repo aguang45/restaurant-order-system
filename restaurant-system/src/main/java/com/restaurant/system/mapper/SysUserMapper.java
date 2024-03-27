@@ -12,6 +12,12 @@ import com.restaurant.common.core.domain.entity.SysUser;
 public interface SysUserMapper
 {
     /**
+     * 查询用户id及姓名列表
+     * @param user
+     * @return
+     */
+    public List<SysUser> selectUserNameList(SysUser user);
+    /**
      * 根据条件分页查询用户列表
      * 
      * @param sysUser 用户信息

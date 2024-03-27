@@ -2,6 +2,9 @@ package com.restaurant.web.controller;
 
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
+
+import com.restaurant.system.domain.DTO.ShoppingCartDTO;
+import com.restaurant.system.domain.DTO.ShoppingCartWithUserAndDish;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,11 +41,12 @@ public class ShoppingCartController extends BaseController
      * 查询购物车列表
      */
     @PreAuthorize("@ss.hasPermi('system:shoppingCart:list')")
+//    @PreAuthorize("@ss.hasAnyRoles('admin, common')")
     @GetMapping("/list")
     public TableDataInfo list(ShoppingCart shoppingCart)
     {
         startPage();
-        List<ShoppingCart> list = shoppingCartService.selectShoppingCartList(shoppingCart);
+        List<ShoppingCartWithUserAndDish> list = shoppingCartService.selectShoppingCartList(shoppingCart);
         return getDataTable(list);
     }
 
@@ -54,8 +58,8 @@ public class ShoppingCartController extends BaseController
     @PostMapping("/export")
     public void export(HttpServletResponse response, ShoppingCart shoppingCart)
     {
-        List<ShoppingCart> list = shoppingCartService.selectShoppingCartList(shoppingCart);
-        ExcelUtil<ShoppingCart> util = new ExcelUtil<ShoppingCart>(ShoppingCart.class);
+        List<ShoppingCartWithUserAndDish> list = shoppingCartService.selectShoppingCartList(shoppingCart);
+        ExcelUtil<ShoppingCartWithUserAndDish> util = new ExcelUtil<ShoppingCartWithUserAndDish>(ShoppingCartWithUserAndDish.class);
         util.exportExcel(response, list, "购物车数据");
     }
 
@@ -63,6 +67,7 @@ public class ShoppingCartController extends BaseController
      * 获取购物车详细信息
      */
     @PreAuthorize("@ss.hasPermi('system:shoppingCart:query')")
+//    @PreAuthorize("@ss.hasAnyRoles('admin, common')")
     @GetMapping(value = "/{shoppingCartId}")
     public AjaxResult getInfo(@PathVariable("shoppingCartId") String shoppingCartId)
     {
@@ -73,6 +78,7 @@ public class ShoppingCartController extends BaseController
      * 新增购物车
      */
     @PreAuthorize("@ss.hasPermi('system:shoppingCart:add')")
+//    @PreAuthorize("@ss.hasAnyRoles('admin, common')")
     @Log(title = "购物车", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody ShoppingCart shoppingCart)
@@ -84,17 +90,19 @@ public class ShoppingCartController extends BaseController
      * 修改购物车
      */
     @PreAuthorize("@ss.hasPermi('system:shoppingCart:edit')")
+//    @PreAuthorize("@ss.hasAnyRoles('admin, common')")
     @Log(title = "购物车", businessType = BusinessType.UPDATE)
     @PutMapping
-    public AjaxResult edit(@RequestBody ShoppingCart shoppingCart)
+    public AjaxResult edit(@RequestBody List<ShoppingCartDTO> list)
     {
-        return toAjax(shoppingCartService.updateShoppingCart(shoppingCart));
+        return toAjax(shoppingCartService.updateShoppingCart(list));
     }
 
     /**
      * 删除购物车
      */
     @PreAuthorize("@ss.hasPermi('system:shoppingCart:remove')")
+//    @PreAuthorize("@ss.hasAnyRoles('admin, common')")
     @Log(title = "购物车", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{shoppingCartIds}")
     public AjaxResult remove(@PathVariable String[] shoppingCartIds)

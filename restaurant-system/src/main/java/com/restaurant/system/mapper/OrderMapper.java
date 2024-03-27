@@ -1,6 +1,9 @@
 package com.restaurant.system.mapper;
 
 import java.util.List;
+
+import com.restaurant.system.domain.DTO.OrderWithOther;
+import com.restaurant.system.domain.DTO.OrderWithOtherForList;
 import com.restaurant.system.domain.Order;
 
 /**
@@ -58,4 +61,25 @@ public interface OrderMapper
      * @return 结果
      */
     public int deleteOrderByOrderIds(String[] orderIds);
+
+    /**
+     * 获取本月取消订单数
+     * @return
+     */
+    public Integer getCancelOrderCount();
+
+    /**
+     * 获取外卖订单详情
+     * @param orderWithOther
+     * @return
+     */
+    public List<OrderWithOther> getOrderWithOtherList(OrderWithOther orderWithOther);
+
+    /**
+     * 获取订单详情
+     * @param orderWithOtherForList
+     * @return
+     */
+    public List<OrderWithOtherForList> getOrderWithOtherForList(Order order);
+
 }

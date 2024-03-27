@@ -1,6 +1,8 @@
 package com.restaurant.system.service;
 
 import java.util.List;
+
+import com.restaurant.system.domain.DTO.UserAddressWithUser;
 import com.restaurant.system.domain.UserAddress;
 
 /**
@@ -25,7 +27,15 @@ public interface IUserAddressService
      * @param userAddress 收货地址
      * @return 收货地址集合
      */
-    public List<UserAddress> selectUserAddressList(UserAddress userAddress);
+    public List<UserAddressWithUser> selectUserAddressList(UserAddress userAddress);
+
+    /**
+     * 查询收货地址列表
+     *
+     * @param userId 用户ID
+     * @return 收货地址集合
+     */
+    public List<UserAddressWithUser> selectUserAddressAppList(String addressId);
 
     /**
      * 新增收货地址

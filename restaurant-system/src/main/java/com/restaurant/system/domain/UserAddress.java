@@ -24,7 +24,7 @@ public class UserAddress extends BaseEntity
 
     /** 手机号码 */
     @Excel(name = "手机号码")
-    private Long phone;
+    private String phone;
 
     /** 收货人 */
     @Excel(name = "收货人")
@@ -63,12 +63,12 @@ public class UserAddress extends BaseEntity
     {
         return userId;
     }
-    public void setPhone(Long phone) 
+    public void setPhone(String phone)
     {
         this.phone = phone;
     }
 
-    public Long getPhone() 
+    public String getPhone()
     {
         return phone;
     }

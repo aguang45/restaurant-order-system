@@ -19,8 +19,8 @@
       </el-form-item>
       <el-form-item label="是否空闲" prop="isFree">
         <el-select v-model="queryParams.isFree" placeholder="请选择是否空闲" clearable>
-          <el-option label="空闲" value="0" />
-          <el-option label="非空闲" value="1" />
+          <el-option label="空闲" value="1" />
+          <el-option label="非空闲" value="0" />
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -121,8 +121,8 @@
         </el-form-item>
         <el-form-item label="是否空闲" prop="isFree">
           <el-select v-model="form.isFree" placeholder="请选择是否空闲">
-            <el-option label="空闲" value="0" />
-            <el-option label="非空闲" value="1" />
+            <el-option label="非空闲" value="0" />
+            <el-option label="空闲" value="1" />
           </el-select>
         </el-form-item>
       </el-form>
@@ -135,12 +135,12 @@
 </template>
 
 
-<style>
-.el-table .warning-row {
+<style scoped lang="scss">
+::v-deep .el-table .warning-row {
   background: oldlace;
 }
 
-.el-table .success-row {
+::v-deep .el-table .success-row {
   background: #f0f9eb;
 }
 </style>
@@ -203,9 +203,9 @@ export default {
     /** 表格行的颜色控制 */
     tableRowClassName({row, rowIndex}) {
       // console.log(row);
-      if (row.isFree === 1) {
+      if (row.isFree === 0) {
         return 'warning-row';
-      } else if (row.isFree === 0) {
+      } else if (row.isFree === 1) {
         return 'success-row';
       }
       return '';
@@ -213,9 +213,9 @@ export default {
     /** 格式化是否空闲 */
     formatIsFree(row, column) {
       if (row.isFree === 0) {
-        return '空闲';
-      } else if (row.isFree === 1) {
         return '非空闲';
+      } else if (row.isFree === 1) {
+        return '空闲';
       } else {
         return '未知';
       }

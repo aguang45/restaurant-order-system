@@ -1,6 +1,12 @@
 package com.restaurant.system.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import com.restaurant.common.utils.bean.BeanUtils;
+import com.restaurant.system.domain.DTO.DishWithCategory;
+import com.restaurant.system.domain.DTO.OrderDetailWithDish;
+import com.restaurant.system.service.IDishService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.restaurant.system.mapper.OrderDetailMapper;
@@ -18,6 +24,8 @@ public class OrderDetailServiceImpl implements IOrderDetailService
 {
     @Autowired
     private OrderDetailMapper orderDetailMapper;
+    @Autowired
+    private IDishService dishService;
 
     /**
      * 查询订单详情
@@ -26,9 +34,33 @@ public class OrderDetailServiceImpl implements IOrderDetailService
      * @return 订单详情
      */
     @Override
-    public OrderDetail selectOrderDetailByOrderDetailId(String orderDetailId)
+    public List<OrderDetail> selectOrderDetailByOrderDetailId(String orderDetailId)
     {
-        return orderDetailMapper.selectOrderDetailByOrderDetailId(orderDetailId);
+        return orderDetailMapper.selectOrderDetailByOrderId(orderDetailId);
+    }
+
+    /**
+     * 查询订单详情列表
+     * @param orderId 订单详情主键
+     * @return
+     */
+    @Override
+    public List<OrderDetailWithDish> selectOrderDetailByOrderId(String orderId)
+    {
+        List<OrderDetailWithDish> orderDetailWithDishes = new ArrayList<>();
+        List<OrderDetail> orderDetails = orderDetailMapper.selectOrderDetailByOrderId(orderId);
+        for (OrderDetail orderDetail : orderDetails) {
+            OrderDetailWithDish orderDetailWithDish = new OrderDetailWithDish();
+            DishWithCategory dishWithCategory = dishService.selectDishByDishId(orderDetail.getDishId());
+            BeanUtils.copyBeanProp(orderDetailWithDish, orderDetail);
+            orderDetailWithDish.setDishName(dishWithCategory.getDishName());
+            orderDetailWithDish.setCategoryName(dishWithCategory.getCategoryName());
+            orderDetailWithDish.setDishPrice(String.valueOf(dishWithCategory.getDishPrice()));
+            orderDetailWithDish.setDishImg(dishWithCategory.getDishImage());
+
+            orderDetailWithDishes.add(orderDetailWithDish);
+        }
+        return orderDetailWithDishes;
     }
 
     /**

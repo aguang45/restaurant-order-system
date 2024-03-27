@@ -1,6 +1,8 @@
 package com.restaurant.system.service.impl;
 
 import java.util.List;
+
+import com.restaurant.common.utils.uuid.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.restaurant.system.mapper.CourierMapper;
@@ -52,6 +54,7 @@ public class CourierServiceImpl implements ICourierService
     @Override
     public int insertCourier(Courier courier)
     {
+        courier.setCourierId(UUID.fastUUID().toString(true));
         return courierMapper.insertCourier(courier);
     }
 

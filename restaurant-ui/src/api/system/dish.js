@@ -9,6 +9,24 @@ export function listDish(query) {
   })
 }
 
+// 查询菜系及菜品列表
+export function listCategoryWithDish(query) {
+  return request({
+    url: '/system/dish/appList',
+    method: 'get',
+    params: query
+  })
+}
+
+// 查询菜品名字列表
+export function listDishName(query) {
+  return request({
+    url: '/system/dish/dishNameList',
+    method: 'get',
+    params: query
+  })
+}
+
 // 查询菜品详细
 export function getDish(dishId) {
   return request({
@@ -40,5 +58,13 @@ export function delDish(dishId) {
   return request({
     url: '/system/dish/' + dishId,
     method: 'delete'
+  })
+}
+
+// 获取菜品排行榜
+export function getDishTop() {
+  return request({
+    url: '/system/dish/getDishTop',
+    method: 'get'
   })
 }

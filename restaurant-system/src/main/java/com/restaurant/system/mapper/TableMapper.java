@@ -1,6 +1,8 @@
 package com.restaurant.system.mapper;
 
 import java.util.List;
+
+import com.restaurant.system.domain.DTO.TableWithOrderDTO;
 import com.restaurant.system.domain.Table;
 
 /**
@@ -58,4 +60,11 @@ public interface TableMapper
      * @return 结果
      */
     public int deleteTableByTableIds(String[] tableIds);
+
+    /**
+     * 获取桌位和订单信息
+     * @param tableWithOrderDTO
+     * @return
+     */
+    public List<TableWithOrderDTO> getTableWithOrder(TableWithOrderDTO tableWithOrderDTO);
 }

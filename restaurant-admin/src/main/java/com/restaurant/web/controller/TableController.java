@@ -2,8 +2,11 @@ package com.restaurant.web.controller;
 
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
+
+import com.restaurant.system.domain.DTO.TableWithOrderDTO;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -37,7 +40,7 @@ public class TableController extends BaseController
     /**
      * 查询桌位列表
      */
-    @PreAuthorize("@ss.hasPermi('system:table:list')")
+    @PreAuthorize("@ss.hasPermi('system:table:query')")
     @GetMapping("/list")
     public TableDataInfo list(Table table)
     {
@@ -100,5 +103,28 @@ public class TableController extends BaseController
     public AjaxResult remove(@PathVariable String[] tableIds)
     {
         return toAjax(tableService.deleteTableByTableIds(tableIds));
+    }
+
+    /**
+     * 查询桌位列表
+     * @param tableWithOrderDTO
+     * @return
+     */
+    @PreAuthorize("@ss.hasPermi('system:table:query')")
+    @GetMapping("/withOrderList")
+    public TableDataInfo tableWithOrderList(TableWithOrderDTO tableWithOrderDTO)
+    {
+        startPage();
+        List<TableWithOrderDTO> list = tableService.getTableWithOrder(tableWithOrderDTO);
+        return getDataTable(list);
+    }
+
+    @Transactional
+    @PreAuthorize("@ss.hasPermi('system:table:edit')")
+    @PutMapping("/setTableFree")
+    public AjaxResult setTableFree(String tableId, String orderId) {
+//        tableService.setTableFree(tableId, isFree);
+        tableService.setTableFree(tableId, orderId);
+        return success();
     }
 }

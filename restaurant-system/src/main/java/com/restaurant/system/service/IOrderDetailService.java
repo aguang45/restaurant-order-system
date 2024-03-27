@@ -1,6 +1,8 @@
 package com.restaurant.system.service;
 
 import java.util.List;
+
+import com.restaurant.system.domain.DTO.OrderDetailWithDish;
 import com.restaurant.system.domain.OrderDetail;
 
 /**
@@ -17,7 +19,14 @@ public interface IOrderDetailService
      * @param orderDetailId 订单详情主键
      * @return 订单详情
      */
-    public OrderDetail selectOrderDetailByOrderDetailId(String orderDetailId);
+    public List<OrderDetail> selectOrderDetailByOrderDetailId(String orderDetailId);
+
+    /**
+     * 查询订单详情列表
+     * @param orderId
+     * @return
+     */
+    public List<OrderDetailWithDish> selectOrderDetailByOrderId(String orderId);
 
     /**
      * 查询订单详情列表

@@ -32,7 +32,35 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where table_id = #{tableId}
           and is_deleted = 0
     </select>
-        
+    <select id="getTableWithOrder" resultType="com.restaurant.system.domain.DTO.TableWithOrderDTO" parameterType="TableWithOrderDTO">
+        SELECT
+        res_table.*,
+        res.order_time,
+        res.order_status,
+        res.order_id
+        FROM
+        res_table
+        LEFT JOIN (
+        SELECT
+        ro.*
+        FROM
+        res_order ro
+        INNER JOIN ( SELECT table_id, MAX( order_time ) AS latest_order_time FROM res_order GROUP BY table_id ) grouped_ro ON ro.table_id = grouped_ro.table_id
+        AND ro.order_time = grouped_ro.latest_order_time
+        ) res ON res.table_id = res_table.table_id
+        <where>
+            res_table.is_deleted = 0
+            <if test="tableId != null and tableId != ''">and res_table.table_id = #{tableId}</if>
+            <if test="orderId != null and orderId != ''">and res.order_id = #{orderId}</if>
+            <if test="tableName != null and tableName != ''">and res_table.table_name like concat('%', #{tableName}, '%')</if>
+            <if test="tableSize != null">and res_table.table_size = #{tableSize}</if>
+            <if test="isFree != null">and res_table.is_free = #{isFree}</if>
+            <if test="orderStatus != null">and res.order_status = #{orderStatus}</if>
+            <if test="orderTime != null">and res.order_time >= #{orderTime}</if>
+        </where>
+
+    </select>
+
     <insert id="insertTable" parameterType="Table">
         insert into res_table
         <trim prefix="(" suffix=")" suffixOverrides=",">

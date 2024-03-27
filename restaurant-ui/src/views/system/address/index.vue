@@ -1,13 +1,24 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="用户id" prop="userId">
+<!--      <el-form-item label="用户姓名" prop="userId">
         <el-input
           v-model="queryParams.userId"
-          placeholder="请输入用户id"
+          placeholder="请输入用户姓名"
           clearable
           @keyup.enter.native="handleQuery"
         />
+      </el-form-item>-->
+      <el-form-item label="用户姓名" prop="userId">
+        <el-select v-model="queryParams.userId" clearable
+                   filterable placeholder="请选择用户姓名">
+          <el-option
+            v-for="item in userList"
+            :key="item.userId"
+            :label="item.nickName"
+            :value="item.userId">
+          </el-option>
+        </el-select>
       </el-form-item>
       <el-form-item label="手机号码" prop="phone">
         <el-input
@@ -25,7 +36,7 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="收货人性别" prop="sex">
+      <el-form-item label="收货人性别" prop="sex" label-width="30">
         <el-select v-model="queryParams.sex" placeholder="请选择收货人性别" clearable>
           <el-option
             v-for="dict in dict.type.sys_user_sex"
@@ -43,7 +54,7 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="是否默认地址" prop="isDefault">
+      <el-form-item label="是否默认" prop="isDefault">
         <el-select v-model="queryParams.isDefault" placeholder="请选择是否默认地址" clearable>
           <el-option
             v-for="dict in dict.type.is_default"
@@ -107,10 +118,11 @@
 
     <el-table v-loading="loading" :data="addressList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="地址id" align="center" prop="addressId" />
+<!--      <el-table-column label="地址id" align="center" prop="addressId" />-->
       <el-table-column label="用户id" align="center" prop="userId" />
+      <el-table-column label="用户姓名" align="center" prop="userName" />
       <el-table-column label="手机号码" align="center" prop="phone" />
-      <el-table-column label="收货人" align="center" prop="name" />
+      <el-table-column label="收货人姓名" align="center" prop="name" />
       <el-table-column label="收货人性别" align="center" prop="sex">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.sys_user_sex" :value="scope.row.sex"/>
@@ -141,7 +153,7 @@
         </template>
       </el-table-column>
     </el-table>
-    
+
     <pagination
       v-show="total>0"
       :total="total"
@@ -175,13 +187,23 @@
           <el-input v-model="form.detailAddress" placeholder="请输入详细地址" />
         </el-form-item>
         <el-form-item label="是否默认地址" prop="isDefault">
-          <el-radio-group v-model="form.isDefault">
+
+          <template slot-scope="scope">
+            <el-tag
+              v-for="item in dict.type.is_default"
+              :key="item.value"
+              v-if="item.value === scope.row.isDefault"
+              :type="item.color"
+            >{{ item.label }}</el-tag>
+          </template>
+
+<!--          <el-radio-group v-model="form.isDefault">
             <el-radio
               v-for="dict in dict.type.is_default"
               :key="dict.value"
               :label="parseInt(dict.value)"
             >{{dict.label}}</el-radio>
-          </el-radio-group>
+          </el-radio-group>-->
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -194,12 +216,15 @@
 
 <script>
 import { listAddress, getAddress, delAddress, addAddress, updateAddress } from "@/api/system/address";
+import {listUser} from "@/api/system/user";
 
 export default {
   name: "Address",
   dicts: ['is_deleted', 'is_default', 'sys_user_sex'],
   data() {
     return {
+      // 用户列表
+      userList:[],
       // 遮罩层
       loading: true,
       // 选中数组
@@ -256,8 +281,15 @@ export default {
   },
   created() {
     this.getList();
+    this.getUserList();
   },
   methods: {
+    /** 获取用户列表 */
+    getUserList() {
+      listUser({pageNum: 1, pageSize: 1000}).then(response => {
+        this.userList = response.rows;
+      });
+    },
     /** 查询收货地址列表 */
     getList() {
       this.loading = true;

@@ -70,6 +70,16 @@ public class OrderDetailController extends BaseController
     }
 
     /**
+     * 获取订单详情详细信息
+     */
+    @PreAuthorize("@ss.hasPermi('system:detail:query')")
+    @GetMapping(value = "/getInfoByOrderId/{orderId}")
+    public AjaxResult getInfoByOrderId(@PathVariable("orderId") String orderId)
+    {
+        return success(orderDetailService.selectOrderDetailByOrderId(orderId));
+    }
+
+    /**
      * 新增订单详情
      */
     @PreAuthorize("@ss.hasPermi('system:detail:add')")

@@ -1,6 +1,8 @@
 package com.restaurant.system.domain;
 
 import java.math.BigDecimal;
+
+import com.baomidou.mybatisplus.annotation.TableId;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import com.restaurant.common.annotation.Excel;
@@ -17,6 +19,7 @@ public class Dish extends BaseEntity
     private static final long serialVersionUID = 1L;
 
     /** 菜品id */
+    @TableId
     private String dishId;
 
     /** 菜品名称 */
@@ -24,7 +27,7 @@ public class Dish extends BaseEntity
     private String dishName;
 
     /** 菜品分类 */
-    @Excel(name = "菜品分类")
+//    @Excel(name = "菜品分类")
     private String dishType;
 
     /** 菜品价格 */
@@ -36,11 +39,18 @@ public class Dish extends BaseEntity
     private String dishDescription;
 
     /** 图片地址 */
-    @Excel(name = "图片地址")
+//    @Excel(name = "图片地址")
     private String dishImage;
 
     /** 逻辑删除 */
     private Integer isDeleted;
+
+    public Dish() {
+    }
+
+    public Dish(String categoryId) {
+        super();
+    }
 
     public void setDishId(String dishId) 
     {

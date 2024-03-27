@@ -1,6 +1,8 @@
 package com.restaurant.system.service;
 
 import java.util.List;
+
+import com.restaurant.system.domain.DTO.TableWithOrderDTO;
 import com.restaurant.system.domain.Table;
 
 /**
@@ -58,4 +60,13 @@ public interface ITableService
      * @return 结果
      */
     public int deleteTableByTableId(String tableId);
+
+    /**
+     * 获取桌位和订单信息
+     * @param tableWithOrderDTO
+     * @return
+     */
+    public List<TableWithOrderDTO> getTableWithOrder(TableWithOrderDTO tableWithOrderDTO);
+
+    public boolean setTableFree(String tableId, String orderId);
 }

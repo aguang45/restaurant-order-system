@@ -1,6 +1,9 @@
 package com.restaurant.system.service;
 
 import java.util.List;
+
+import com.restaurant.system.domain.DTO.ShoppingCartDTO;
+import com.restaurant.system.domain.DTO.ShoppingCartWithUserAndDish;
 import com.restaurant.system.domain.ShoppingCart;
 
 /**
@@ -25,7 +28,7 @@ public interface IShoppingCartService
      * @param shoppingCart 购物车
      * @return 购物车集合
      */
-    public List<ShoppingCart> selectShoppingCartList(ShoppingCart shoppingCart);
+    public List<ShoppingCartWithUserAndDish> selectShoppingCartList(ShoppingCart shoppingCart);
 
     /**
      * 新增购物车
@@ -41,7 +44,7 @@ public interface IShoppingCartService
      * @param shoppingCart 购物车
      * @return 结果
      */
-    public int updateShoppingCart(ShoppingCart shoppingCart);
+    public int updateShoppingCart(List<ShoppingCartDTO> list);
 
     /**
      * 批量删除购物车

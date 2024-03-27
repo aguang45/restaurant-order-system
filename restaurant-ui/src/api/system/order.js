@@ -9,6 +9,15 @@ export function listOrder(query) {
   })
 }
 
+// 查询订单列表
+export function listOrderForList(query) {
+  return request({
+    url: '/system/order/getOrderWithOtherForList',
+    method: 'get',
+    params: query
+  })
+}
+
 // 查询订单详细
 export function getOrder(orderId) {
   return request({
@@ -40,5 +49,22 @@ export function delOrder(orderId) {
   return request({
     url: '/system/order/' + orderId,
     method: 'delete'
+  })
+}
+
+// 获取热门数据
+export function getTopData() {
+  return request({
+    url: '/system/order/getTopData',
+    method: 'get'
+  })
+}
+
+// 查询外卖订单列表
+export function listOrderWithOther(query) {
+  return request({
+    url: '/system/order/getOrderWithOther',
+    method: 'get',
+    data: query
   })
 }
