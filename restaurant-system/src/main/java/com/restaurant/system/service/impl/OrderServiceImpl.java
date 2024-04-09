@@ -1,5 +1,6 @@
 package com.restaurant.system.service.impl;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 import com.restaurant.common.core.redis.RedisCache;
 import com.restaurant.common.utils.SecurityUtils;
 import com.restaurant.common.utils.bean.BeanUtils;
+import com.restaurant.common.utils.uuid.UUID;
 import com.restaurant.system.domain.*;
 import com.restaurant.system.domain.DTO.*;
 import com.restaurant.system.mapper.PaymentMapper;
@@ -238,6 +240,9 @@ public class OrderServiceImpl implements IOrderService {
     }
 
 
+    @Autowired
+    IOrderService orderService;
+
     /**
      * 修改订单
      *
@@ -245,9 +250,31 @@ public class OrderServiceImpl implements IOrderService {
      * @return 结果
      */
     @Override
+    @Transactional
     public int updateOrder(Order order) {
         if ("2".equals(order.getDeliveryStatus())) {
             order.setOrderStatus("3");
+        }
+        if (order.getCourierId()==null&&order.getDeliveryStatus()==null) {
+            Payment payment = new Payment();
+            order = orderService.selectOrderByOrderId(order.getOrderId());
+            order.setOrderStatus("1");
+            payment.setPaymentId(UUID.fastUUID().toString(true));
+            payment.setOrderId(order.getOrderId());
+            payment.setPaymentTime(LocalDateTime.now());
+//        计算总价
+            OrderDetail orderDetail = new OrderDetail();
+            orderDetail.setOrderId(order.getOrderId());
+            List<OrderDetail> orderDetailList = orderDetailService.selectOrderDetailList(orderDetail);
+            BigDecimal amount = new BigDecimal(0);
+            for (OrderDetail orderDetail1 : orderDetailList) {
+                amount = amount.add(orderDetail1.getSubtotal());
+            }
+            payment.setAmount(amount);
+            payment.setPaymentMethod("1");
+
+            paymentService.insertResPayment(payment);
+
         }
         return orderMapper.updateOrder(order);
     }

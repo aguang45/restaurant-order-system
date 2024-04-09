@@ -664,6 +664,7 @@ export default {
       addOrder(orderData).then(response => {
         this.$modal.msgSuccess("下单成功");
         this.shoppingDialogVisible = false;
+        this.tableId = null;
         this.shoppingCartList = [];
         // console.log(response);
         if (this.isPay) {

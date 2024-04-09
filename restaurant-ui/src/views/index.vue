@@ -62,6 +62,9 @@
                   label="共计卖出"
                   align="center"
                 >
+                  <template slot-scope="scope">
+                    {{ scope.row.count }} 份
+                  </template>
                 </el-table-column>
               </el-table>
             </div>
