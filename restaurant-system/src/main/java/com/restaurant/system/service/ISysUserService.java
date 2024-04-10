@@ -2,6 +2,7 @@ package com.restaurant.system.service;
 
 import java.util.List;
 import com.restaurant.common.core.domain.entity.SysUser;
+import com.restaurant.system.domain.SysAuthUser;
 
 /**
  * 用户 业务层
@@ -204,5 +205,13 @@ public interface ISysUserService
      */
     public String importUser(List<SysUser> userList, Boolean isUpdateSupport, String operName);
 
-    public List<SysUser> selectUserNameList(SysUser user);
+    /**
+     * 根据用户编号查询授权列表
+     * 
+     * @param userId 用户编号
+     * @return 授权列表
+     */
+    public List<SysAuthUser> selectAuthUserListByUserId(Long userId);
+
+    List<SysUser> selectUserNameList(SysUser user);
 }

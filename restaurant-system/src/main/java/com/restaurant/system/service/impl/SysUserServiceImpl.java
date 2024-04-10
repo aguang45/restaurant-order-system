@@ -19,6 +19,7 @@ import com.restaurant.common.utils.SecurityUtils;
 import com.restaurant.common.utils.StringUtils;
 import com.restaurant.common.utils.bean.BeanValidators;
 import com.restaurant.common.utils.spring.SpringUtils;
+import com.restaurant.system.domain.SysAuthUser;
 import com.restaurant.system.domain.SysPost;
 import com.restaurant.system.domain.SysUserPost;
 import com.restaurant.system.domain.SysUserRole;
@@ -542,8 +543,20 @@ public class SysUserServiceImpl implements ISysUserService
         return successMsg.toString();
     }
 
+    /**
+     * 根据用户编号查询授权列表
+     * 
+     * @param userId 用户编号
+     * @return 授权列表
+     */
+    public List<SysAuthUser> selectAuthUserListByUserId(Long userId)
+    {
+        return userMapper.selectAuthUserListByUserId(userId);
+    }
+
+//    @TODO
     @Override
     public List<SysUser> selectUserNameList(SysUser user) {
-        return userMapper.selectUserNameList(user);
+        return null;
     }
 }

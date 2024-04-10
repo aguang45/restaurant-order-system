@@ -11,11 +11,23 @@ export function login(username, password, code, uuid) {
   return request({
     url: '/login',
     headers: {
-      isToken: false,
-      repeatSubmit: false
+      isToken: false
     },
     method: 'post',
     data: data
+  })
+}
+
+// 第三方平台登录
+export function socialLogin(source, code, state) {
+  const data = {
+    code,
+    state
+  }
+  return request({
+    url: '/system/auth/social-login/' + source,
+    method: 'get',
+    params: data
   })
 }
 
