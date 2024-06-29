@@ -49,7 +49,8 @@ public class OrderServiceImpl implements IOrderService {
     private IOrderDetailService orderDetailService;
     @Autowired
     private IDishService dishService;
-    private List<OrderDetailWithDish> orderDetailsWithDishes;
+    @Autowired
+    IOrderService orderService;
 
 
     /**
@@ -96,28 +97,17 @@ public class OrderServiceImpl implements IOrderService {
 //            设置座位信息
                 orderWithUser.setTableName(tableService.selectTableByTableId(order1.getTableId()).getTableName());
             }
-//            设置订单详情信息
-            /*List<OrderDetail> orderDetails = orderDetailService.selectOrderDetailByOrderId(order1.getOrderId());
-            List<OrderDetialWithDish> orderDetialWithDishes = new ArrayList<>();
-            for (OrderDetail orderDetail : orderDetails) {
-                OrderDetialWithDish orderDetialWithDish = new OrderDetialWithDish();
-                BeanUtils.copyProperties(orderDetail, orderDetialWithDish);
-                DishWithCategory dishWithCategory = dishService.selectDishByDishId(orderDetail.getDishId());
-                orderDetialWithDish.setDishName(dishWithCategory.getDishName());
-                orderDetialWithDish.setDishPrice(String.valueOf(dishWithCategory.getDishPrice()));
-                orderDetialWithDish.setDishImg(dishWithCategory.getDishImage());
-                orderDetialWithDish.setCategoryName(dishWithCategory.getCategoryName());
-                orderDetialWithDishes.add(orderDetialWithDish);
-            }
-
-            orderWithUser.setOrderDetails(orderDetialWithDishes);*/
-
             list.add(orderWithUser);
         }
 
         return list;
     }
 
+    /**
+     * app端查询订单列表
+     * @param order 订单
+     * @return
+     */
     @Override
     public List<OrderWithUser> selectOrderAppList(Order order) {
 //        设置用户id
@@ -198,30 +188,10 @@ public class OrderServiceImpl implements IOrderService {
                 if (redisCache.getCacheObject(orderId) == null) {
                     // 订单超时
                     outTimeOrder(order);
-                    // 不需要再次删除Redis中的键，因为它已经因为过期而不存在
                 }
             }
         }
     }
-
-    /*public void checkOrderTime() {
-        Order order1 = new Order();
-        order1.setOrderStatus("0");
-        List<Order> orders = orderMapper.selectOrderList(order1);
-        for (Order order : orders) {
-            String orderId = "order:" + order.getUserId() + ":" + order.getOrderId();
-            Payment payment = paymentService.selectResPaymentByOrderId(order.getOrderId());
-            if ("0".equals(order.getOrderStatus()) && payment == null) {
-                if (redisCache.getCacheObject(orderId) == null) {
-                    outTimeOrder(order);
-                    redisCache.deleteObject(orderId);
-                } else if (System.currentTimeMillis() - (long) redisCache.getCacheObject(orderId) > 60 * 30 * 1000) {
-                    outTimeOrder(order);
-                    redisCache.deleteObject(orderId);
-                }
-            }
-        }
-    }*/
 
     /**
      * 超时订单处理
@@ -229,7 +199,6 @@ public class OrderServiceImpl implements IOrderService {
      */
     private void outTimeOrder(Order order) {
         order.setOrderStatus("2");
-//        order.setIsDeleted(1);
         orderMapper.updateOrder(order);
 //        释放座位
         if (order.getTableId() != null) {
@@ -238,10 +207,6 @@ public class OrderServiceImpl implements IOrderService {
             tableService.updateTable(table);
         }
     }
-
-
-    @Autowired
-    IOrderService orderService;
 
     /**
      * 修改订单

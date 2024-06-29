@@ -52,13 +52,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="getTodayPaymentSubtotal" resultType="com.restaurant.system.domain.DTO.CategoryNameAndSubtotal">
         SELECT
             res2.category_name ,
-            SUM( res_payment.amount ) subtotal
+            SUM( res2.dish_quantity * res2.subtotal ) subtotal
         FROM
             res_payment
                 LEFT JOIN (
                 SELECT
                     res.category_name,
-                    res_order_detail.order_id
+                    res_order_detail.order_id,
+                    res_order_detail.dish_quantity,
+                    res_order_detail.subtotal
                 FROM
                     res_order_detail
                         LEFT JOIN ( SELECT res_dish.dish_id, res_category.category_name FROM res_dish LEFT JOIN res_category ON res_category.category_id = res_dish.dish_type ) AS res ON res.dish_id = res_order_detail.dish_id
@@ -70,10 +72,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="getYesterdayPaymentSubtotal"
             resultType="com.restaurant.system.domain.DTO.CategoryNameAndSubtotal">
         SELECT res2.category_name,
-               SUM(res_payment.amount) subtotal
+               SUM( res2.dish_quantity * res2.subtotal ) subtotal
         FROM res_payment
-                 LEFT JOIN (SELECT res.category_name,
-                                   res_order_detail.order_id
+                 LEFT JOIN (SELECT 		res.category_name,
+                                          res_order_detail.order_id,
+                                          res_order_detail.dish_quantity,
+                                          res_order_detail.subtotal
                             FROM res_order_detail
                                      LEFT JOIN (SELECT res_dish.dish_id, res_category.category_name
                                                 FROM res_dish

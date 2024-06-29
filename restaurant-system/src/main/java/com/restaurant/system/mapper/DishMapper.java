@@ -64,7 +64,24 @@ public interface DishMapper extends BaseMapper<Dish>
      */
     public int deleteDishByDishIds(String[] dishIds);
 
+    /**
+     * 查询菜品列表
+     * @param dish
+     * @return
+     */
     public List<Dish> selectDishNameList(Dish dish);
 
-    public List<DishTop> getDishTop();
+    /**
+     * 查询菜品排行榜
+     * @param limit
+     * @return
+     */
+    public List<DishTop> getDishTop(Integer limit);
+
+    /**
+     * 获取用户近两个月购买次数前三的菜品
+     * @param userId
+     * @return
+     */
+    public List<DishTop> getDishsByUserId(String userId);
 }

@@ -50,29 +50,53 @@
     <select id="selectDishNameList" resultType="com.restaurant.system.domain.Dish">
         select dish_id,dish_name from res_dish where is_deleted = 0
     </select>
+<!--    获取购买次数排行前几的菜品-->
     <select id="getDishTop" resultType="com.restaurant.system.domain.DTO.DishTop">
         SELECT
-            di.category_name,
-            di.dish_name,
-            di.dish_price,
-            COUNT(*) count
+            di.*,
+            SUM(d.dish_quantity) count
         FROM
             `res_order_detail` d
                 LEFT JOIN (
                 SELECT
-                    d.dish_id,
-                    d.dish_name,
-                    d.dish_price,
+                    d.*,
                     c.category_name
                 FROM
                     res_dish d
                         LEFT JOIN res_category c ON d.dish_type = c.category_id
+                where d.is_deleted = 0
             ) di ON d.dish_id = di.dish_id
         GROUP BY
             d.dish_id
         ORDER BY
             count DESC
-        LIMIT 6
+        <if test="limit != null">
+            LIMIT #{limit}
+        </if>
+        <if test="limit == null">
+            LIMIT 6
+        </if>
+    </select>
+<!--    查询某用户订单中购买次数最多的菜品及次数-->
+    <select id="getDishsByUserId" resultType="com.restaurant.system.domain.DTO.DishTop">
+        SELECT
+            res_order_detail.dish_id,
+            SUM(res_order_detail.dish_quantity) AS count,
+            user_id,
+            res_dish.*
+        FROM
+            res_order_detail
+                LEFT JOIN res_order ON res_order_detail.order_id = res_order.order_id
+                LEFT JOIN res_dish ON res_order_detail.dish_id = res_dish.dish_id
+        WHERE
+            order_time >= DATE_SUB( CURDATE(), INTERVAL 2 MONTH )
+          AND res_order.is_deleted = 0
+          AND user_id = #{userId}
+        GROUP BY
+            res_order_detail.dish_id
+        ORDER BY
+            count DESC
+        LIMIT 3;
     </select>
 
     <insert id="insertDish" parameterType="Dish">

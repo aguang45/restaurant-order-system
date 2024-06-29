@@ -123,7 +123,6 @@ public class TableController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:table:edit')")
     @PutMapping("/setTableFree")
     public AjaxResult setTableFree(String tableId, String orderId) {
-//        tableService.setTableFree(tableId, isFree);
         tableService.setTableFree(tableId, orderId);
         return success();
     }

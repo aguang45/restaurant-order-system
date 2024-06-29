@@ -107,7 +107,7 @@ public class PaymentController extends BaseController
         List<OrderDetail> orderDetailList = orderDetailService.selectOrderDetailList(orderDetail);
         BigDecimal amount = new BigDecimal(0);
         for (OrderDetail orderDetail1 : orderDetailList) {
-            amount = amount.add(orderDetail1.getSubtotal());
+            amount = amount.add(orderDetail1.getSubtotal().multiply(new BigDecimal(orderDetail1.getDishQuantity())));
         }
         payment.setAmount(amount);
         payment.setPaymentMethod("1");

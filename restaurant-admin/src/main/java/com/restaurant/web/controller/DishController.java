@@ -59,15 +59,13 @@ public class DishController extends BaseController
     }
 
     /**
-     * 查询菜品列表
+     * 客户端查询菜品列表
      */
-//    @PreAuthorize("@ss.hasPermi('system:dish:list')")
     @Anonymous
     @GetMapping("/appList")
     public List<CategoryWithDish> listAll()
     {
-        List<CategoryWithDish> list = dishService.selectCategoryWithDishList();
-        return list;
+        return dishService.selectCategoryWithDishList();
     }
 
     /**
@@ -147,9 +145,16 @@ public class DishController extends BaseController
     @GetMapping("/getDishTop")
     public AjaxResult getDishTop()
     {
-        return success(dishService.selectDishTopList());
+        return success(dishService.selectDishTopList(null));
     }
 
+    /**
+     * 导入菜品数据
+     * @param file
+     * @param updateSupport
+     * @return
+     * @throws Exception
+     */
     @Log(title = "菜品数据", businessType = BusinessType.IMPORT)
     @PostMapping("/importData")
     public AjaxResult importData(MultipartFile file, boolean updateSupport) throws Exception
@@ -162,6 +167,10 @@ public class DishController extends BaseController
         return AjaxResult.success(message);
     }
 
+    /**
+     * 导出菜品模板
+     * @param response
+     */
     @PostMapping("/importTemplate")
     public void importTemplate(HttpServletResponse response)
     {

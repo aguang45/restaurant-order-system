@@ -68,7 +68,7 @@ public interface IDishService extends IService<Dish>
 
     List<Dish> selectDishNameList(Dish dish);
 
-    List<DishTop> selectDishTopList();
+    List<DishTop> selectDishTopList(Integer limit);
 
     String importDish(List<Dish> dishList, Boolean isUpdateSupport, String operName);
 }
